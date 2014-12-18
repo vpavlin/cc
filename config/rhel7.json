@@ -1,0 +1,49 @@
+{
+    "name": "rhel-7.0",
+    
+    "test": {
+        "image": "rhel-server-docker-7.0-24.x86_64",
+        "tests": [
+            {
+                "name": "package check",
+                "run": "rpm -qa",
+                "output": "test1.out",     
+                "check": {
+                    "grep": ["systemd-container.*207", "rootfiles"]
+                }
+            },
+            {
+                "name": "diff latest",
+                "path": "./test/diff.sh",
+                "args": ["rhel-server-docker-6.5-11.x86_64"]
+            },
+            {
+                "name": "machine-id",
+                "run": "cat /etc/machine-id",
+                "check": {
+                    "grep": "No such file"
+                }
+            },
+            {
+                "name": "container=docker",
+                "run": "printenv",
+                "check": {
+                    "grep": "docker"
+                },
+                    "output": "test3.out"
+            },
+
+            {
+                "name": "test2",
+                "run": "/usr/sbin/init",
+                "env": ["container=docker"],
+                "volumes": ["/sys/fs/cgroup:/sys/fs/cgroup:ro"],
+                "output": "test2.out",
+                "timeout": 5,
+                "check": {
+                    "grep": "Reached target Multi-User System"
+                }
+            }
+        ]
+    }
+}

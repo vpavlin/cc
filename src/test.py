@@ -37,8 +37,9 @@ def time_limit(seconds):  # From http://stackoverflow.com/a/601168/1576438
 
 
 class ImageTests():
-    config={}
-    dockerfile_builds={}
+    config = {}
+    dockerfile_builds = {}
+    driver_ext = ( '.py', '.pyo', '.pyc' )
     
     def __init__(self, config, debug=False):
         '''
@@ -57,11 +58,19 @@ class ImageTests():
             fail("Missing config!")                   
 
         self.client = docker.Client(timeout=3600)
+        self.load_test_drivers(os.path.join(os.path.dirname(__file__), "tests"))
  
     def __del__(self):
         '''
         Clean after yourself
         '''
+
+    def load_test_drivers(self, drivers_dir):
+        logger.debug(drivers_dir)
+        for driver in os.listdir(drivers_dir):
+            if driver.endswith(self.driver_ext) and not driver.startswith('__init__.py'):
+                logger.debug("Loading %s" % driver)
+
 
     def create_binds(self, volumes):
         binds={}
@@ -96,6 +105,10 @@ class ImageTests():
         if "grep" in check_config:
             result = self.run_check_grep(check_config['grep'], output)
             logger.debug("Result: %s" % result)
+        if "empty_output" in check_config and check_config['empty_output']:
+            logger.debug(output)
+            if len(output) == 0:
+                logger.info("Ok")
 
     def run_test_path(self, image, test_config):
         logger.info("Running %s" % test_config['path'])
@@ -187,24 +200,6 @@ class ImageTests():
             self.run_check(self.client.logs(cont_id), test_config['check'])
 
         self.client.remove_container(cont_id)
-
-        
-
-    def run_dockerfile_test(self, test_config):
-        logger.debug(test_config['dockerfile'])
-        if not os.path.exists(os.path.join(test_config['dockerfile'], "Dockerfile")):
-            logger.error("Dockerfile not found in dockerfile_path")
-            return
-
-        response = [line for line in self.client.build(path=test_config['dockerfile'], rm=True, timeout=3600, nocache=True, tag=test_config['name'])]
-        
-        if 'error' in response[-1]:
-            logger.error(json.loads(response[-1])['error'])
-        else:
-            logger.info("Build of %s finnished" % test_config['name'])
-            self.dockerfile_builds[test_config['name']]=json.loads(response[-1])['stream']
-
-        logger.debug(response)
 
     def run_dockerfile_rm(self, test_config):
         if not os.path.exists(os.path.join(test_config['dockerfile'], "Dockerfile")) or not test_config['name'] in self.dockerfile_builds:

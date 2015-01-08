@@ -1,0 +1,41 @@
+{
+    "name": "rhel-7.0",
+    
+    "test": {
+        "image": "rhel-server-docker-6.6-4.x86_64",
+        "tests": [
+            {
+                "name": "package check",
+                "run": "rpm -qa",
+                "output": "test1.out",     
+                "check": {
+                    "grep": ["rootfiles"]
+                }
+            },
+            {
+                "name": "lock check",
+                "path": "./test/passwd.sh",
+                "output": "lock.out" 
+            },
+            {
+                "name": "package diff latest",
+                "path": "./test/pkg-diff.sh",
+                "args": ["rhel6"],
+                "output": "pkg-diff.out"
+            },
+            {
+                "name": "size diff latest",
+                "path": "./test/size-diff.sh",
+                "args": ["rhel6"],
+                "output": "size-diff.out"
+            },
+            {
+                "name": "version diff latest",
+                "path": "./test/diff.sh",
+                "args": ["rhel6"],
+                "output": "version-diff.out"
+            }
+
+        ]
+    }
+}

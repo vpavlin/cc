@@ -21,17 +21,7 @@ logger = logging.getLogger('DockerBaseImages')
 format = logging.Formatter("%(levelname)s: %(message)s")
 
 
-def read_conf(conf_file):
-    conf = ConfigParser.ConfigParser()
-    conf.readfp(open(conf_file))
-    return conf
 
-def scrub_list(alist):
-    """
-    Take a comma-separate list, split on the commas, and scrub out any leading
-    or trailing whitespace for each element.
-    """
-    return [p.strip() for p in alist.split(',')]
 
 
 def touchopen(filename, *args, **kwargs):
@@ -46,7 +36,7 @@ def fail(msg):
     sys.exit(1)
 
 
-class BaseImages():
+class ContainerChecker():
     config={}
     
     def __init__(self, config):
@@ -91,9 +81,9 @@ if __name__ == "__main__":
     else:
         logger.setLevel(logging.INFO)
     
-    bib = BaseImages(args.config)
-    bib.build()
-    bib.test()
+    cc = ContainerChecker(args.config)
+    cc.build()
+    cc.test()
     
     logger.debug("Done.")
     sys.exit(0)

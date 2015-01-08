@@ -1,0 +1,18 @@
+{
+    "name": "rhel-7.0",
+    
+    "test": {
+        "image": "rhel-server-docker-7.0-24.x86_64",
+        "tests": [
+            {
+                "name": "hello check",
+                "run": "echo hello",
+                "output": "test1.out",     
+                "check": {
+                    "grep": ["hello"]
+                }
+            }
+            
+        ]
+    }
+}

@@ -1,0 +1,68 @@
+{
+    "name": "rhel-7.0",
+    
+    "test": {
+        "image": "rhel-server-docker-7.1-2.x86_64",
+        "tests": [
+            {
+                "name": "package check",
+                "run": "rpm -qa",
+                "output": "test1.out",     
+                "check": {
+                    "grep": ["systemd-container.*208", "rootfiles"]
+                }
+            },
+            {
+                "name": "lock check",
+                "path": "./test/passwd.sh",
+                "output": "lock.out" 
+            },
+            {
+                "name": "package diff latest",
+                "path": "./test/pkg-diff.sh",
+                "args": ["rhel7"],
+                "output": "pkg-diff.out"
+            },
+            {
+                "name": "size diff latest",
+                "path": "./test/size-diff.sh",
+                "args": ["rhel7"],
+                "output": "size-diff.out"
+            },
+            {
+                "name": "version diff latest",
+                "path": "./test/diff.sh",
+                "args": ["rhel7"],
+                "output": "version-diff.out"
+            },
+
+            {
+                "name": "machine-id",
+                "run": "cat /etc/machine-id",
+                "check": {
+                    "grep": "No such file"
+                }
+            },
+            {
+                "name": "container=docker",
+                "run": "printenv",
+                "check": {
+                    "grep": "docker"
+                },
+                    "output": "test3.out"
+            },
+
+            {
+                "name": "test2",
+                "run": "/usr/sbin/init",
+                "env": ["container=docker"],
+                "volumes": ["/sys/fs/cgroup:/sys/fs/cgroup:ro"],
+                "output": "test2.out",
+                "timeout": 10,
+                "check": {
+                    "grep": "Reached target Multi-User System"
+                }
+            }
+        ]
+    }
+}

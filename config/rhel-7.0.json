@@ -62,7 +62,7 @@
                 "check": {
                     "grep": "Reached target Multi-User System"
                 }
-            }
+            },
             {
                 "name": "yum install",
                 "run": "yum -y install httpd",
